@@ -1,0 +1,20 @@
+concept Person
+concept Movie
+
+property name: Person -> string
+property actor: Movie -> Person
+property director: Movie -> Person
+property played_with: Person -> Person
+
+fact Znd a Person
+  name "Zendaya"
+  is actor of Spiderman
+
+rule played_together:
+  match:
+    ?one is actor of [ a Movie, actor ?two ]
+  then:
+    ?one played_with ?two
+
+query same_director:
+  ?movie1 director [ is director of ?movie2 ]

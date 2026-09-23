@@ -1,0 +1,6 @@
+prefix <http://example.com/animals/> as zoo
+
+concept Animal
+
+concept Dog:
+  sub zoo:Animal

@@ -1,0 +1,25 @@
+concept Human
+
+concept Appointment:
+  has organizer: one Human
+    inverse of organizes
+
+property parent: Human -> Human
+
+property loves: Human -> Human
+  symmetric
+  reflexive
+
+property friend_of: Human -> Human
+
+property sub_friend: Human -> Human
+  sub friend_of
+
+property grand_parent: Human -> Human
+  equivalent to parent / parent
+
+property sibling: Human -> Human
+  equivalent to parent / ^parent
+
+property ancestor: Human -> Human
+  equivalent to parent+

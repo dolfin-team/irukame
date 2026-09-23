@@ -1,0 +1,27 @@
+---
+source: irukame/tests/turtle_snapshots.rs
+expression: ttl
+---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+@prefix : <http://example.org/test#> .
+@prefix machin: <http://example.org/test/machin#> .
+@prefix ee: <http://example.com/onto/> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+
+<http://example.org/test> rdf:type owl:Ontology
+  ; dc:creator "test"
+  ; owl:versionInfo "0.1.0" .
+
+<http://example.org/test/machin> rdfs:isDefinedBy <http://example.org/test> .
+
+machin:Machin rdf:type rdfs:Class
+  ; rdfs:subClassOf ee:Truc
+  ; skos:prefLabel "Machin"
+  ; rdfs:isDefinedBy <http://example.org/test/machin>
+  .

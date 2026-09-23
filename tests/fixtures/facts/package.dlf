@@ -1,0 +1,4 @@
+package <http://example.org/animals>:
+  dolfin_version "1"
+  version "0.1.0"
+  author "test"

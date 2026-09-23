@@ -1,0 +1,17 @@
+# Multilingual doc-comment / definition fixture.
+#
+# Cat exercises all four carrier/predicate/language combinations:
+#   (a) #en> + #fr> leading comments  -> two rdfs:comment@lang
+#   (b) a plain "# …" leading comment -> one untagged rdfs:comment
+#   (c) definition@en= + definition@fr= -> two skos:definition@lang
+#   (d) a plain definition=            -> one untagged skos:definition
+
+#@ glossary:
+#@   definition@en=A domesticated feline kept as a companion animal.
+#@   definition@fr=Un félin domestique gardé comme animal de compagnie.
+#@   definition=An untagged feline definition.
+#en> A cat is a small carnivorous mammal.
+#fr> Un chat est un petit mammifère carnivore.
+# A plain untagged remark about cats.
+concept Cat:
+  has species: string

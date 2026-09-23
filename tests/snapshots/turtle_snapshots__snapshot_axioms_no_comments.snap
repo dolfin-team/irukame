@@ -1,0 +1,118 @@
+---
+source: irukame/tests/turtle_snapshots.rs
+expression: "gen_from_fixture(\"axioms\", false)"
+---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+@prefix : <http://example.org/family#> .
+@prefix family: <http://example.org/family/family#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+
+<http://example.org/family> rdf:type owl:Ontology
+  ; dc:creator "test"
+  ; owl:versionInfo "0.1.0" .
+
+<http://example.org/family/family> rdfs:isDefinedBy <http://example.org/family> .
+
+family:Human rdf:type rdfs:Class
+  ; skos:prefLabel "Human"
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+
+family:Appointment rdf:type rdfs:Class
+  ; skos:prefLabel "Appointment"
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+
+family:organizer rdf:type owl:ObjectProperty
+  ; rdfs:domain family:Appointment
+  ; rdfs:range family:Human
+  ; rdf:type owl:FunctionalProperty
+  ; skos:prefLabel "organizer"
+  ; owl:inverseOf family:organizes
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+family:Appointment owl:equivalentClass [
+  rdf:type owl:Restriction
+  ; owl:onProperty family:organizer ;
+  owl:cardinality "1"^^xsd:nonNegativeInteger
+  ]
+  .
+
+family:parent rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "parent"
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+
+family:loves rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "loves"
+  ; rdf:type owl:SymmetricProperty
+  ; rdf:type owl:ReflexiveProperty
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+
+family:friend_of rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "friend_of"
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+
+family:sub_friend rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "sub_friend"
+  ; rdfs:subPropertyOf family:friend_of
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+
+family:grand_parent rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "grand_parent"
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+family:grand_parent rdfs:subPropertyOf [
+    rdf:type owl:ObjectProperty ;
+    owl:propertyChainAxiom ( family:parent family:parent )
+  ] .
+
+family:sibling rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "sibling"
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+family:sibling rdfs:subPropertyOf [
+    rdf:type owl:ObjectProperty ;
+    owl:propertyChainAxiom ( family:parent [ owl:inverseOf family:parent ] )
+  ] .
+
+family:ancestor rdf:type owl:ObjectProperty
+    , owl:FunctionalProperty
+  ; rdfs:domain family:Human
+  ; rdfs:range family:Human
+  ; skos:prefLabel "ancestor"
+  ; rdf:type owl:TransitiveProperty
+  ; rdfs:isDefinedBy <http://example.org/family/family>
+  .
+family:ancestor rdfs:subPropertyOf family:parent .
+family:ancestor rdfs:subPropertyOf [
+    rdf:type owl:ObjectProperty ;
+    owl:propertyChainAxiom ( family:parent family:ancestor )
+  ] .

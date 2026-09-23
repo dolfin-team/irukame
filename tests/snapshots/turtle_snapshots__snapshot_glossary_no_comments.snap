@@ -1,0 +1,143 @@
+---
+source: irukame/tests/turtle_snapshots.rs
+assertion_line: 34
+expression: "gen_from_fixture(\"glossary\", false)"
+---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+@prefix : <http://example.org/hr#> .
+@prefix hr: <http://example.org/hr/hr#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+
+<http://example.org/hr> rdf:type owl:Ontology
+  ; dc:creator "test"
+  ; owl:versionInfo "0.1.0" .
+
+<http://example.org/hr/hr> rdfs:isDefinedBy <http://example.org/hr> .
+
+hr:Person rdf:type rdfs:Class
+  ; skos:prefLabel "Person"
+  ; rdfs:comment "A person in the HR system."
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:name rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:Person
+  ; rdfs:range xsd:string
+  ; skos:prefLabel "name"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:email rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:Person
+  ; rdfs:range xsd:string
+  ; skos:prefLabel "email"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:EmploymentStatus rdf:type rdfs:Class
+  ; skos:prefLabel "Employment Status"
+  ; skos:definition "The employment contract type of an employee."
+  ; skos:altLabel "Contract type"
+  ; skos:scopeNote "Only applies to direct employees, not contractors."
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:EmploymentStatus owl:equivalentClass [ rdf:type owl:Class ; owl:oneOf ( hr:EmploymentStatus_FULL_TIME hr:EmploymentStatus_PART_TIME hr:EmploymentStatus_CONTRACTOR hr:EmploymentStatus_INTERN ) ] .
+
+hr:EmploymentStatus_FULL_TIME rdf:type owl:NamedIndividual , hr:EmploymentStatus ; rdfs:isDefinedBy <http://example.org/hr/hr> .
+hr:EmploymentStatus_PART_TIME rdf:type owl:NamedIndividual , hr:EmploymentStatus ; rdfs:isDefinedBy <http://example.org/hr/hr> .
+hr:EmploymentStatus_CONTRACTOR rdf:type owl:NamedIndividual , hr:EmploymentStatus ; rdfs:isDefinedBy <http://example.org/hr/hr> .
+hr:EmploymentStatus_INTERN rdf:type owl:NamedIndividual , hr:EmploymentStatus ; rdfs:isDefinedBy <http://example.org/hr/hr> .
+
+hr:Employee rdf:type rdfs:Class
+  ; rdfs:subClassOf hr:Person
+  ; skos:prefLabel "Employee"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:employeeId rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:Employee
+  ; rdfs:range xsd:string
+  ; skos:prefLabel "employeeId"
+  ; rdfs:comment "The unique employee identifier assigned by HR."
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:salary rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:Employee
+  ; rdfs:range xsd:double
+  ; skos:prefLabel "Annual salary"
+  ; skos:definition "Gross annual salary in EUR."
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:HelicopterNoBlanks rdf:type rdfs:Class
+  ; skos:prefLabel "Helicopter"
+  ; rdfs:comment "Rotary-wing aircraft. Adjacent description, no blank line."
+  ; skos:altLabel "Rotor Aircraft"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:serialNum rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:HelicopterNoBlanks
+  ; rdfs:range xsd:string
+  ; rdf:type owl:FunctionalProperty
+  ; skos:prefLabel "serialNum"
+  ; rdfs:comment "Unique aircraft identifier."
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+hr:HelicopterNoBlanks owl:equivalentClass [
+  rdf:type owl:Restriction
+  ; owl:onProperty hr:serialNum ;
+  owl:cardinality "1"^^xsd:nonNegativeInteger
+  ]
+  .
+
+hr:HelicopterWithBlank rdf:type rdfs:Class
+  ; skos:prefLabel "Helicopter Blank"
+  ; rdfs:comment "Rotary-wing aircraft. Blank line before description."
+  ; skos:altLabel "Rotor Aircraft Blank"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:serialNum2 rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:HelicopterWithBlank
+  ; rdfs:range xsd:string
+  ; rdf:type owl:FunctionalProperty
+  ; skos:prefLabel "serialNum2"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+hr:HelicopterWithBlank owl:equivalentClass [
+  rdf:type owl:Restriction
+  ; owl:onProperty hr:serialNum2 ;
+  owl:cardinality "1"^^xsd:nonNegativeInteger
+  ]
+  .
+
+hr:Department rdf:type rdfs:Class
+  ; skos:prefLabel "Department"
+  ; rdfs:comment "A department is a region of space"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:deptName rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:Department
+  ; rdfs:range xsd:string
+  ; skos:prefLabel "deptName"
+  ; rdfs:comment "The name of the department"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .
+
+hr:headCount rdf:type owl:DatatypeProperty
+  ; rdfs:domain hr:Department
+  ; rdfs:range xsd:integer
+  ; skos:prefLabel "headCount"
+  ; rdfs:comment "The number of `Employee`s with `Salary` in the `Department`"
+  ; rdfs:isDefinedBy <http://example.org/hr/hr>
+  .

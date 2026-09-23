@@ -1,0 +1,32 @@
+---
+source: irukame/tests/turtle_snapshots.rs
+expression: "gen_from_fixture(\"uri_prefix\", false)"
+---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+@prefix : <http://example.org/test#> .
+@prefix animals: <http://example.org/test/animals#> .
+@prefix zoo: <http://example.com/animals/> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+
+<http://example.org/test> rdf:type owl:Ontology
+  ; dc:creator "test"
+  ; owl:versionInfo "0.1.0" .
+
+<http://example.org/test/animals> rdfs:isDefinedBy <http://example.org/test> .
+
+animals:Animal rdf:type rdfs:Class
+  ; skos:prefLabel "Animal"
+  ; rdfs:isDefinedBy <http://example.org/test/animals>
+  .
+
+animals:Dog rdf:type rdfs:Class
+  ; rdfs:subClassOf zoo:Animal
+  ; skos:prefLabel "Dog"
+  ; rdfs:isDefinedBy <http://example.org/test/animals>
+  .

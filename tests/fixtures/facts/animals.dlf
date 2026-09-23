@@ -1,0 +1,33 @@
+concept Dog
+concept Owner
+concept VaccinationRecord
+
+property name: Dog -> string
+property weight: Dog -> float
+property age: Dog -> int
+property neutered: Dog -> boolean
+property owner: Dog -> Owner
+property vaccination: Dog -> VaccinationRecord
+property first_name: Owner -> string
+property spouse: Owner -> Owner
+
+fact rex a Dog
+  name "Rex"
+  weight 45.0
+  age 3
+  neutered true
+  owner :John
+
+fact felix a Dog, NeverVaccinated
+  name "Felix"
+
+fact John a Owner
+  first_name "John"
+  is spouse of :jane
+
+fact jane a Owner
+  first_name "Jane"
+  vaccination [
+    a VaccinationRecord
+    name "Rabies"
+  ]
