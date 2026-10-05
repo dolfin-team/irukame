@@ -2,7 +2,7 @@
 //!
 //! A plugin reads `#@` annotations from a loaded [`Package`] (which now
 //! carries a [`CommentMap`] per ontology file) and transforms annotated AST
-//! sub-trees into additional output artefacts (SHACL, OWL config, …).
+//! sub-trees into additional output artefacts (SHACL, SparNatural config, …).
 //!
 //! Parsers and tools that do not have a plugin installed simply ignore any
 //! `#@` comments — the core Dolfin language is unaffected.

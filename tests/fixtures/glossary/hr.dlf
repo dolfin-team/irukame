@@ -1,0 +1,55 @@
+# HR ontology: glossary SKOS emission fixture
+
+# A person in the HR system.
+concept Person:
+  has name: string
+  has email: string
+
+#@ glossary:
+#@   label=Employment Status
+#@   definition=The employment contract type of an employee.
+#@   alt_label=Contract type
+#@   scope_note=Only applies to direct employees, not contractors.
+concept EmploymentStatus:
+  one of:
+    FULL_TIME
+    PART_TIME
+    CONTRACTOR
+    INTERN
+
+#@ glossary:
+#@   label=Employee
+concept Employee:
+  sub Person
+
+  # The unique employee identifier assigned by HR.
+  has employeeId: string
+
+  #@ glossary:
+  #@   label=Annual salary
+  #@   definition=Gross annual salary in EUR.
+  has salary: float
+
+#@ glossary:
+#@    pref_label=Helicopter
+#@    alt_label=Rotor Aircraft
+# Rotary-wing aircraft. Adjacent description, no blank line.
+concept HelicopterNoBlanks:
+  # Unique aircraft identifier.
+  has serialNum: one string
+
+#@ glossary:
+#@    pref_label=Helicopter Blank
+#@    alt_label=Rotor Aircraft Blank
+
+# Rotary-wing aircraft. Blank line before description.
+concept HelicopterWithBlank:
+  has serialNum2: one string
+
+# A department is a region of space
+concept Department:
+  # The name of the department
+  has deptName: string
+
+  # The number of {Employee}s with {Salary} in the {Department}
+  has headCount: int

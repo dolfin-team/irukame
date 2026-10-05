@@ -94,10 +94,10 @@ fn test_fact_property_literal() {
 #[test]
 fn test_fact_reference() {
     let ttl = run_generator();
-    // owner :John — fact reference serialized with colon prefix
+    // owner John — a fact of this file, in this file's namespace
     assert!(
-        ttl.contains(":John"),
-        "expected reference :John:\n{ttl}"
+        ttl.contains("animals:rex animals:owner animals:John ."),
+        "expected reference animals:John:\n{ttl}"
     );
 }
 
@@ -132,14 +132,87 @@ fn test_fact_type_hint_block() {
 #[test]
 fn test_fact_inverse() {
     let ttl = run_generator();
-    // `is spouse of :jane` on John → :jane <spouse_prop> <John_ref>
-    // the value (:jane) becomes the subject, spouse the predicate, John the object
+    // `is spouse of jane` on John → jane spouse John
+    // the value (jane) becomes the subject, spouse the predicate, John the object
     assert!(
-        ttl.contains(":jane"),
-        "expected :jane in inverse triple:\n{ttl}"
+        ttl.contains("animals:jane animals:spouse animals:John ."),
+        "expected inverse triple jane spouse John:\n{ttl}"
     );
-    assert!(
-        ttl.contains("spouse"),
-        "expected spouse property in inverse triple:\n{ttl}"
-    );
+}
+
+#[test]
+fn test_fact_bare_property_resolved_by_type() {
+    let files: std::collections::HashMap<String, String> = [
+        ("package.dlf", "package <http://example.org/zoo>:\n  dolfin_version \"1\"\n  version \"0.1.0\"\n  author \"test\"\n"),
+        ("person.dlf", "concept Person:\n  has name: string\n"),
+        ("animal.dlf", "concept Animal:\n  has name: string\n"),
+        ("example.dlf", "fact jack a person.Person\n  name \"Jack\"\n  pet [\n    a animal.Animal\n    name \"Tom\"\n  ]\n\nfact rex a animal.Animal\n  name \"Rex\"\n"),
+    ]
+    .into_iter()
+    .map(|(k, v)| (k.to_owned(), v.to_owned()))
+    .collect();
+    let package = rowl::package::load_package_from_memory(&files).expect("package should load");
+    let ttl = TurtleGenerator::new(TurtleOptions {
+        base_iri: "http://example.org/".to_string(),
+        include_comments: false,
+        include_rules_as_comments: false,
+        include_queries_as_comments: false,
+    })
+    .generate(&package)
+    .expect("generation should succeed");
+
+    assert!(ttl.contains("example:jack person:name \"Jack\""), "{ttl}");
+    assert!(ttl.contains("example:rex animal:name \"Rex\""), "{ttl}");
+    assert!(ttl.contains(" animal:name \"Tom\""), "{ttl}");
+    assert!(!ttl.contains("example:name"), "{ttl}");
+}
+
+#[test]
+fn test_rule_bare_property_resolved_by_type() {
+    let files: std::collections::HashMap<String, String> = [
+        ("package.dlf", "package <http://example.org/zoo>:\n  dolfin_version \"1\"\n  version \"0.1.0\"\n  author \"test\"\n"),
+        ("person.dlf", "concept Person:\n  has name: string\n  has pet: animal.Animal\n  has nick: string\n"),
+        ("animal.dlf", "concept Animal:\n  has name: string\n"),
+        (
+            "example.dlf",
+            "rule nick_from_pet:\n  match:\n    ?x a person.Person\n    ?x pet [ name ?n ]\n  then:\n    ?x nick ?n\n",
+        ),
+    ]
+    .into_iter()
+    .map(|(k, v)| (k.to_owned(), v.to_owned()))
+    .collect();
+    let package = rowl::package::load_package_from_memory(&files).expect("package should load");
+    let n3 = irukame::rules_as_n3(&package).expect("n3 generates");
+
+    assert!(n3.contains(" animal:name ?n"), "{n3}");
+    assert!(n3.contains("?x person:nick ?n"), "{n3}");
+    assert!(!n3.contains("example:name"), "{n3}");
+}
+
+#[test]
+fn test_query_bare_property_resolved_by_type() {
+    let files: std::collections::HashMap<String, String> = [
+        ("package.dlf", "package <http://example.org/zoo>:\n  dolfin_version \"1\"\n  version \"0.1.0\"\n  author \"test\"\n"),
+        ("person.dlf", "concept Person:\n  has name: string\n  has pet: animal.Animal\n\nquery people:\n  ?p a Person\n"),
+        ("animal.dlf", "concept Animal:\n  has name: string\n"),
+        ("example.dlf", "query pets:\n  ?x a person.Person\n    name ?n\n    pet [ name ?m ]\n"),
+    ]
+    .into_iter()
+    .map(|(k, v)| (k.to_owned(), v.to_owned()))
+    .collect();
+    let package = rowl::package::load_package_from_memory(&files).expect("package should load");
+    let ttl = TurtleGenerator::new(TurtleOptions {
+        base_iri: "http://example.org/".to_string(),
+        include_comments: false,
+        include_rules_as_comments: false,
+        include_queries_as_comments: true,
+    })
+    .generate(&package)
+    .expect("generation should succeed");
+
+    assert!(ttl.contains("?x person:name ?n"), "{ttl}");
+    assert!(ttl.contains("?x person:pet ?_v"), "{ttl}");
+    assert!(ttl.contains(" animal:name ?m"), "{ttl}");
+    assert!(ttl.contains("?x a person:Person ."), "{ttl}");
+    assert!(ttl.contains("?p a person:Person ."), "{ttl}");
 }

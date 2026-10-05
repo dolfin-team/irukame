@@ -1,6 +1,5 @@
 ---
 source: irukame/tests/turtle_snapshots.rs
-assertion_line: 34
 expression: "gen_from_fixture(\"glossary\", false)"
 ---
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -9,6 +8,8 @@ expression: "gen_from_fixture(\"glossary\", false)"
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 @prefix : <http://example.org/hr#> .
 @prefix hr: <http://example.org/hr/hr#> .

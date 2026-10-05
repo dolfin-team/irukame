@@ -16,14 +16,14 @@ fact rex a Dog
   weight 45.0
   age 3
   neutered true
-  owner :John
+  owner John
 
 fact felix a Dog, NeverVaccinated
   name "Felix"
 
 fact John a Owner
   first_name "John"
-  is spouse of :jane
+  is spouse of jane
 
 fact jane a Owner
   first_name "Jane"

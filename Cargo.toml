@@ -1,16 +1,17 @@
 [package]
 name = "irukame"
 description = "Turtle/OWL/N3 code generation for dolfin, plus the DolfinPlugin trait for annotation-driven generators"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2024"
 
 [dependencies]
-rowl = { version = "0.1.6", features = ["fs"] }
-dolfin-datetime = { version = "0.1.8", default-features = false }
+rowl = { version = "0.1.10", features = ["fs"] }
+dolfin-datetime = { version = "0.1.9", default-features = false }
 dolfin-units = { version = "0.1.9", default-features = false }
-dolfin-analysis = { version = "0.1.6", default-features = false }
+dolfin-analysis = { version = "0.1.10", default-features = false }
 thiserror = "2.0.18"
-dolfin-query = { path = "../dolfin-query" }
+serde = { version = "1", features = ["derive"] }
+dolfin-query = { version = "0.1.10" }
 
 [dev-dependencies]
 insta = "1"

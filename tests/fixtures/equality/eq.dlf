@@ -1,0 +1,68 @@
+concept Person
+
+property age: Person -> integer
+property name: Person -> string
+property adult: Person -> boolean
+
+rule r_num:
+  match:
+    ?p age [ = 18 ]
+  then:
+    ?p adult true
+
+rule r_str:
+  match:
+    ?p name [ = "Bob" ]
+  then:
+    ?p adult true
+
+rule r_not_str:
+  match:
+    ?p name [ != "Bob" ]
+  then:
+    ?p adult false
+
+property friend: Person -> Person
+property twin: Person -> Person
+
+rule r_var_num:
+  match:
+    ?p age ?a
+    ?q age [ = ?a ]
+  then:
+    ?p twin ?q
+
+rule r_var_str:
+  match:
+    ?p name ?n
+    ?q name [ = ?n ]
+  then:
+    ?p twin ?q
+
+rule r_var_iri:
+  match:
+    ?p friend ?f
+    ?q friend [ != ?f ]
+  then:
+    ?p twin ?q
+
+concept Mass
+property weight: Person -> Mass
+
+rule r_var_qty:
+  match:
+    ?p weight ?w
+    ?q weight [ = ?w ]
+  then:
+    ?p twin ?q
+
+# `Length` is declared nowhere: still a dimension, so its values are quantities.
+concept Rod
+  has len: unit:Length
+
+rule r_var_len:
+  match:
+    ?p len ?l
+    ?q len [ > ?l ]
+  then:
+    ?p twin ?q
