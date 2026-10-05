@@ -45,13 +45,11 @@ fn collect_chain<'a>(op: &BinaryOp, expr: &'a Expr, out: &mut Vec<&'a Expr>) {
         right,
         ..
     } = expr
-    {
-        if child_op == op {
+        && child_op == op {
             collect_chain(op, left, out);
             collect_chain(op, right, out);
             return;
         }
-    }
     out.push(expr);
 }
 
@@ -163,13 +161,11 @@ fn dimension_range_iri_for_ctx(type_ref: &TypeRef, ctx: &GeneratorContext) -> Op
 
     for (_, ontology) in ctx.package.iter_ontologies() {
         for decl in &ontology.ast.declarations {
-            if let Declaration::Concept(c) = decl {
-                if *c.name.get() == dim_name {
-                    if let Some(IriNameValue::AbsoluteUri(iri)) = &c.iri_name {
+            if let Declaration::Concept(c) = decl
+                && *c.name.get() == dim_name
+                    && let Some(IriNameValue::AbsoluteUri(iri)) = &c.iri_name {
                         return Some(iri.clone());
                     }
-                }
-            }
         }
     }
 
@@ -214,6 +210,9 @@ enum CmpKind {
     Quantity,
 }
 
+/// Each emitted declaration with its byte range in the output.
+type DeclRanges = Vec<(DeclKey, Range<usize>)>;
+
 /// Turtle code generator.
 pub struct TurtleGenerator {
     options: TurtleOptions,
@@ -242,7 +241,7 @@ pub struct TurtleGenerator {
     /// Output byte ranges of each emitted declaration, relative to the `body`
     /// buffer of the current `generate` call (rebased to the final output
     /// there). Written behind `&self` by the `write_*` fns, hence `RefCell`.
-    decl_ranges: RefCell<Vec<(DeclKey, Range<usize>)>>,
+    decl_ranges: RefCell<DeclRanges>,
     /// Type inference over the package, rebuilt per `generate`: picks which
     /// `a.name` / `b.name` a bare `name` in a fact means from the fact's type.
     types: Option<(TypeIndex, FactGraph)>,
@@ -330,7 +329,7 @@ impl TurtleGenerator {
     pub fn generate_with_decl_ranges(
         &mut self,
         package: &Package,
-    ) -> Result<(String, Vec<(DeclKey, Range<usize>)>), TurtleError> {
+    ) -> Result<(String, DeclRanges), TurtleError> {
         self.decl_ranges.borrow_mut().clear();
         self.unit_defs.borrow_mut().clear();
         self.uses_log_builtins = false;
@@ -354,7 +353,7 @@ impl TurtleGenerator {
         self.write_ontology_declaration(&mut body, package)?;
         for (namespace, ontology) in package.iter_ontologies() {
             let mut ontology = ontology.clone();
-            for (prefix, _) in &seen_prefixes {
+            for prefix in seen_prefixes.keys() {
                 ontology.resolved_prefixes.entry(prefix.to_string()).or_insert_with(|| {
                     package.namespace().join(&QualifiedName {
                         parts: vec![prefix.clone()],
@@ -453,7 +452,7 @@ impl TurtleGenerator {
         let mut body = String::new();
         for (namespace, ontology) in package.iter_ontologies() {
             let mut ontology = ontology.clone();
-            for (prefix, _) in &seen_prefixes {
+            for prefix in seen_prefixes.keys() {
                 ontology.resolved_prefixes.entry(prefix.to_string()).or_insert_with(|| {
                     package.namespace().join(&QualifiedName {
                         parts: vec![prefix.clone()],
@@ -496,6 +495,7 @@ impl TurtleGenerator {
     /// - `#@ glossary:` `definition=` / `definition@xx=` args → `skos:definition`
     ///   literals; `label=` / `alt_label=` / `scope_note=` → the SKOS labels.
     /// - The entity `name` → `skos:prefLabel`.
+    ///
     /// A leading comment never becomes `skos:definition`, and a `definition=`
     /// arg never becomes `rdfs:comment`.
     ///
@@ -557,7 +557,7 @@ impl TurtleGenerator {
                 let ann_end_line = c.line + ann_line_count - 1;
                 let just_before_concept = ann_end_line + 1 == target_line;
                 let just_before_leading = first_leading_line
-                    .map_or(false, |fl| ann_end_line + 1 == fl || ann_end_line + 2 == fl);
+                    .is_some_and(|fl| ann_end_line + 1 == fl || ann_end_line + 2 == fl);
                 if (just_before_concept || just_before_leading)
                     && let Some(ann) = parse_annotation(c)
                     && ann.name == "glossary"
@@ -835,11 +835,10 @@ impl TurtleGenerator {
             let effective = self.namespace_to_iri_with_override(namespace, ontology.iri_name.as_ref());
             (effective == base_iri).then_some(ontology)
         });
-        if let Some(ontology) = base_ontology {
-            if let Some(ann) = extract_ontology_annotation(ontology) {
+        if let Some(ontology) = base_ontology
+            && let Some(ann) = extract_ontology_annotation(ontology) {
                 push_ontology_annotation_clauses(&mut clauses, &ann);
             }
-        }
 
         writeln!(out, "<{}> rdf:type owl:Ontology", base_iri)?;
         let last = clauses.len() - 1;
@@ -1010,8 +1009,8 @@ impl TurtleGenerator {
         }
 
         // Handle one_of variants as named individuals
-        if let Some(variants) = &concept.one_of {
-            if !variants.is_empty() {
+        if let Some(variants) = &concept.one_of
+            && !variants.is_empty() {
                 // Restrict class to enumeration of named individuals
                 let eq_start = out.len();
                 write!(
@@ -1055,7 +1054,6 @@ impl TurtleGenerator {
                 }
                 writeln!(out)?;
             }
-        }
 
         Ok(())
     }
@@ -3106,8 +3104,8 @@ mod tests {
             "\"42\"^^xsd:integer"
         );
         assert_eq!(
-            generator.render_literal(&Literal::Float { value: 3.14, span: None }),
-            "\"3.14\"^^xsd:float"
+            generator.render_literal(&Literal::Float { value: 2.5, span: None }),
+            "\"2.5\"^^xsd:float"
         );
         assert_eq!(
             generator.render_literal(&Literal::Boolean { value: true, span: None }),

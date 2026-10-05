@@ -3,6 +3,12 @@ name = "irukame"
 description = "Turtle/OWL/N3 code generation for dolfin, plus the DolfinPlugin trait for annotation-driven generators"
 version = "0.1.10"
 edition = "2024"
+license = "MIT"
+keywords = ["semantic-web", "ontology", "dolfin", "knowledge-graph", "language"]
+categories = ["compilers", "parsing"]
+homepage = "https://www.dolfin.fr"
+repository = "https://github.com/dolfin-team/irukame"
+readme = "README.md"
 
 [dependencies]
 rowl = { version = "0.1.10", features = ["fs"] }
